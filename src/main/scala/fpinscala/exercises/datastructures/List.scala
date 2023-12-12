@@ -1,5 +1,7 @@
 package fpinscala.exercises.datastructures
 
+import scala.annotation.tailrec
+
 /** `List` data type, parameterized on a type, `A`. */
 enum List[+A]:
   /** A `List` data constructor representing the empty list. */
@@ -47,19 +49,73 @@ object List: // `List` companion object. Contains functions for creating and wor
   def productViaFoldRight(ns: List[Double]): Double =
     foldRight(ns, 1.0, _ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
 
-  def tail[A](l: List[A]): List[A] = ???
+  def tail[A](l: List[A]): List[A] =
+    l match
+      case Nil => sys.error("the list is nil")
+      case Cons(x, xs) => xs
 
-  def setHead[A](l: List[A], h: A): List[A] = ???
+  def setHead[A](l: List[A], h: A): List[A] =
+    l match
+      case Nil => sys.error("the list is nil")
+      case Cons(x, xs) => List.Cons(h, xs)
 
-  def drop[A](l: List[A], n: Int): List[A] = ???
+  @tailrec
+  def drop[A](l: List[A], n: Int): List[A] =
+    l match
+      case Nil => List()
+      case Cons(x, xs) => if ( n <= 0 ) l else drop(tail(l), n-1)
 
-  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = ???
+  @tailrec
+  def dropWhile[A](l: List[A], f: A => Boolean): List[A] =
+    l match
+      case Nil => List()
+      case Cons(x, xs) => if (f(x)) dropWhile(xs, f) else l
 
-  def init[A](l: List[A]): List[A] = ???
+//  @tailrec
+  def init[A](l: List[A]): List[A] =
+    l match
+      case Nil => sys.error("the list is nil")
+      case Cons(x, Nil) => List()
+      case Cons(x, Cons(_, Nil)) => List.Cons(x, Nil)
+      case Cons(x, xs) => List.Cons(x, List.init(xs))
 
-  def length[A](l: List[A]): Int = ???
+  def length[A](l: List[A]): Int = l match
+    case Nil => 0
+    case Cons(x, xs) => List.foldRight(l, 0, (list, acc) => acc + 1)
 
-  def foldLeft[A,B](l: List[A], acc: B, f: (B, A) => B): B = ???
+  @tailrec
+  def last[A](l: List[A]): A = l match
+    case Nil => sys.error("the list is nil")
+    case Cons(x, Nil) => x
+    case Cons(x, xs) => last(xs)
+
+// Non tail rec answer :-(
+//  @tailrec
+//  def foldLeft[A,B](l: List[A], acc: B, f: (B, A) => B): B = l match
+//    case Nil => acc
+//    case Cons (x, xs) =>
+//      val lastOne = last(l)
+//      val firstOnes = init(l)
+//      f(foldLeft(firstOnes, acc, f), lastOne)
+
+// Seems ok but test is failing!?!?
+//  @tailrec
+//  def foldLeft[A, B](l: List[A], acc: B, f: (B, A) => B): B = l match
+//    case Nil => acc
+//    case Cons(x, xs) =>
+//      val lastOne = last(l)
+//      val firstOnes = init(l)
+//      foldLeft(firstOnes, f(acc, lastOne), f)
+//
+//  println("ADDITION: " + foldLeft(List(1,2,3,4,5), 0, _ + _))
+//  println("MULTIPLICATION: " + foldLeft(List(1,2,3,4,5), 1, _ * _))
+//
+// Because the order does not matter you can flip the head annd the tail
+// @tailrec
+  def foldLeft[A, B](l: List[A], acc: B, f: (B, A) => B): B = l match
+    case Nil => acc
+    case Cons(head, tail) =>
+      foldLeft(tail, f(acc, head), f)
 
   def sumViaFoldLeft(ns: List[Int]): Int = ???
 
