@@ -79,51 +79,64 @@ object List: // `List` companion object. Contains functions for creating and wor
       case Cons(x, Cons(_, Nil)) => List.Cons(x, Nil)
       case Cons(x, xs) => List.Cons(x, List.init(xs))
 
-  def length[A](l: List[A]): Int = l match
-    case Nil => 0
-    case Cons(x, xs) => List.foldRight(l, 0, (list, acc) => acc + 1)
+  def length[A](l: List[A]): Int =
+    l match
+      case Nil => 0
+      case Cons(x, xs) => List.foldRight(l, 0, (_, acc) => acc + 1)
 
   @tailrec
-  def last[A](l: List[A]): A = l match
-    case Nil => sys.error("the list is nil")
-    case Cons(x, Nil) => x
-    case Cons(x, xs) => last(xs)
+  def last[A](l: List[A]): A =
+    l match
+      case Nil => sys.error("the list is nil")
+      case Cons(x, Nil) => x
+      case Cons(x, xs) => last(xs)
 
 // Non tail rec answer :-(
 //  @tailrec
-//  def foldLeft[A,B](l: List[A], acc: B, f: (B, A) => B): B = l match
-//    case Nil => acc
-//    case Cons (x, xs) =>
-//      val lastOne = last(l)
-//      val firstOnes = init(l)
-//      f(foldLeft(firstOnes, acc, f), lastOne)
+//  def foldLeft[A,B](l: List[A], acc: B, f: (B, A) => B): B =
+//    l match
+//      case Nil => acc
+//      case Cons (x, xs) =>
+//        val lastOne = last(l)
+//        val firstOnes = init(l)
+//        f(foldLeft(firstOnes, acc, f), lastOne)
 
 // Seems ok but test is failing!?!?
 //  @tailrec
-//  def foldLeft[A, B](l: List[A], acc: B, f: (B, A) => B): B = l match
-//    case Nil => acc
-//    case Cons(x, xs) =>
-//      val lastOne = last(l)
-//      val firstOnes = init(l)
-//      foldLeft(firstOnes, f(acc, lastOne), f)
+//  def foldLeft[A, B](l: List[A], acc: B, f: (B, A) => B): B =
+//    l match
+//      case Nil => acc
+//      case Cons(x, xs) =>
+//        val lastOne = last(l)
+//        val firstOnes = init(l)
+//        foldLeft(firstOnes, f(acc, lastOne), f)
 //
 //  println("ADDITION: " + foldLeft(List(1,2,3,4,5), 0, _ + _))
 //  println("MULTIPLICATION: " + foldLeft(List(1,2,3,4,5), 1, _ * _))
 //
 // Because the order does not matter you can flip the head annd the tail
 // @tailrec
-  def foldLeft[A, B](l: List[A], acc: B, f: (B, A) => B): B = l match
-    case Nil => acc
-    case Cons(head, tail) =>
-      foldLeft(tail, f(acc, head), f)
+  def foldLeft[A, B](l: List[A], acc: B, f: (B, A) => B): B =
+    l match
+      case Nil => acc
+      case Cons(head, tail) =>
+        foldLeft(tail, f(acc, head), f)
 
-  def sumViaFoldLeft(ns: List[Int]): Int = ???
+  def sumViaFoldLeft(ns: List[Int]): Int =
+    foldLeft(ns, 0, _ + _)
 
-  def productViaFoldLeft(ns: List[Double]): Double = ???
+  def productViaFoldLeft(ns: List[Double]): Double =
+    foldLeft(ns, 1, _ * _)
 
-  def lengthViaFoldLeft[A](l: List[A]): Int = ???
+  def lengthViaFoldLeft[A](l: List[A]): Int = l match
+    case Nil => 0
+    case Cons(x, xs) => foldLeft(l, 0, (acc, _) => acc + 1)
 
-  def reverse[A](l: List[A]): List[A] = ???
+  def reverse[A](l: List[A]): List[A] = l match
+    case Nil => sys.error("the list is nil")
+    case Cons(x, Nil) => List()
+    case Cons(x, Cons(_, Nil)) => List.Cons(x, Nil)
+    case Cons(x, xs) => List.Cons(x, List.init(xs))
 
   def appendViaFoldRight[A](l: List[A], r: List[A]): List[A] = ???
 
