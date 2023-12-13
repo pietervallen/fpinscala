@@ -76,7 +76,7 @@ object List: // `List` companion object. Contains functions for creating and wor
     l match
       case Nil => sys.error("the list is nil")
       case Cons(x, Nil) => List()
-      case Cons(x, Cons(_, Nil)) => List.Cons(x, Nil)
+      case Cons(x, Cons(_, Nil)) => List.Cons(x, Nil) // Remove the last entry
       case Cons(x, xs) => List.Cons(x, List.init(xs))
 
   def length[A](l: List[A]): Int =
@@ -132,11 +132,28 @@ object List: // `List` companion object. Contains functions for creating and wor
     case Nil => 0
     case Cons(x, xs) => foldLeft(l, 0, (acc, _) => acc + 1)
 
-  def reverse[A](l: List[A]): List[A] = l match
-    case Nil => sys.error("the list is nil")
-    case Cons(x, Nil) => List()
-    case Cons(x, Cons(_, Nil)) => List.Cons(x, Nil)
-    case Cons(x, xs) => List.Cons(x, List.init(xs))
+// First attempt without fold
+//  def reverse[A](l: List[A]): List[A] =
+//    l match
+//      case Nil => List()
+//      case Cons(head, tail) =>
+//        val lastOne = last(l)
+//        val firstOnes = init(l)
+//        List.Cons(lastOne, reverse(firstOnes))
+
+// My failing attempt
+//  def reverse[A](l: List[A]): List[A] =
+//    l match
+//      case Nil => List()
+//      case Cons(first, Cons(second, Nil)) => Cons(second, Cons(first, Nil)) // Switch entries
+//      case Cons(head, tail) =>
+//        List.Cons(
+//          foldLeft(tail, Nil: List[A], (first, second) =>  Cons(second, first)),
+//          List(head)
+//        )
+
+// After looking at the answer
+  def reverse[A] (as: List[A]): List[A] = foldLeft(as, Nil: List[A], (acc, a) => Cons(a, acc))
 
   def appendViaFoldRight[A](l: List[A], r: List[A]): List[A] = ???
 
