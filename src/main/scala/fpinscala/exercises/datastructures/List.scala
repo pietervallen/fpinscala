@@ -159,13 +159,13 @@ object List: // `List` companion object. Contains functions for creating and wor
 
   def concat[A](l: List[List[A]]): List[A] = foldRight(l, Nil: List[A], append)
 
-  def incrementEach(l: List[Int]): List[Int] = ???
+  def incrementEach(l: List[Int]): List[Int] = foldRight(l, Nil: List[Int], (x,y) => Cons(x + 1, y))
 
-  def doubleToString(l: List[Double]): List[String] = ???
+  def doubleToString(l: List[Double]): List[String] = foldRight(l, Nil: List[String], (x,y) => Cons(x.toString, y))
 
-  def map[A,B](l: List[A], f: A => B): List[B] = ???
+  def map[A,B](l: List[A], f: A => B): List[B] = foldRight(l, Nil: List[B], (x,y) => Cons(f(x), y))
 
-  def filter[A](as: List[A], f: A => Boolean): List[A] = ???
+  def filter[A](as: List[A], f: A => Boolean): List[A] = foldRight(as, Nil: List[A], (x,y) => if f(x) then Cons(x,y) else y)
 
   def flatMap[A,B](as: List[A], f: A => List[B]): List[B] = ???
 
