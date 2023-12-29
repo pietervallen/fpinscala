@@ -91,6 +91,12 @@ object List: // `List` companion object. Contains functions for creating and wor
       case Cons(x, Nil) => x
       case Cons(x, xs) => last(xs)
 
+  def head[A](l: List[A]): A =
+    l match
+      case Nil => sys.error("the list is nil")
+      case Cons(x, Nil) => x
+      case Cons(x, xs) => x
+
 // Non tail rec answer :-(
 //  @tailrec
 //  def foldLeft[A,B](l: List[A], acc: B, f: (B, A) => B): B =
@@ -174,8 +180,43 @@ object List: // `List` companion object. Contains functions for creating and wor
 
   def filterViaFlatMap[A](as: List[A], f: A => Boolean): List[A] = flatMap(as, a => if f(a) then List(a) else List())
 
-  def addPairwise(a: List[Int], b: List[Int]): List[Int] = ???
+// My attempt
+//  def addPairwise(a: List[Int], b: List[Int]): List[Int] = a match
+//    case Nil => List()
+//    case Cons(hda, Nil) => b match
+//      case Nil => List()
+//      case Cons(hdb, Nil) => List(hda, hdb)
+//      case Cons(hdb, tlb) => List(hda, hdb)
+//    case Cons(hda, tla) => b match
+//      case Nil => List()
+//      case Cons(hdb, Nil) => List(hda, hdb)
+//      case Cons(hdb, tlb) => flatMap(a, first => append(List(first + head(b)), addPairwise(tail(a), tail(b))))
 
-  // def zipWith - TODO determine signature
+  def addPairwise(a: List[Int], b: List[Int]): List[Int] = (a, b) match
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1 + h2, addPairwise(t1, t2))
 
-  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = ???
+//  def zipWith[A, B, C](a: List[A], b: List[B], f: (A, B) => C): List[C] = (a, b) match
+//    case (Nil, _) => Nil
+//    case (_, Nil) => Nil
+//    case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), zipWith(t1, t2, f))
+
+  def zipWith[A, B, C](a: List[A], b: List[B], f: (A, B) => C): List[C] =
+    @annotation.tailrec
+    def loop(a: List[A], b: List[B], acc: List[C]): List[C] = (a, b) match
+      case (Nil, _) => acc
+      case (_, Nil) => acc
+      case (Cons(h1, t1), Cons(h2, t2)) => loop(t1, t2, Cons(f(h1, h2), acc))
+    reverse(loop(a, b, Nil))
+
+  @annotation.tailrec
+  def startsWith[A](l: List[A], prefix: List[A]): Boolean = (l, prefix) match
+    case (_, Nil) => true
+    case (Cons(h, t), Cons(h2, t2)) if h == h2 => startsWith(t, t2)
+    case _ => false
+
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = sup match
+    case Nil => sub == Nil
+    case _ if startsWith(sup, sub) => true
+    case Cons(h, t) => hasSubsequence(t, sub)
